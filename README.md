@@ -9,13 +9,23 @@
 > **用 Windows？** 请移步原仓库 👉 **<https://github.com/SuperPrintf/MonsterDeleter>**
 > 本仓库只做 macOS 版本。
 
-![选择目标](docs/screenshots/01-select.jpg)
+## 演示
+
+![演示](docs/demo.gif)
+
+真机录屏：右键召唤 → 准星标记目标 → 怪兽走过来问「是这个吗」→ 一脚踹进废纸篓 → 雷欧登场收工。
+[高清版（带声音）](docs/demo.mp4)，也可以在 [Releases](../../releases) 里下载。
+
+<details>
+<summary>各阶段单帧</summary>
 
 | 怪兽走来 | 确认 | 踹飞 | 雷欧登场 |
 | --- | --- | --- | --- |
 | ![走来](docs/screenshots/04-walk-late.png) | ![确认](docs/screenshots/06-ask.png) | ![踹飞](docs/screenshots/07-kick-boom.png) | ![雷欧](docs/screenshots/08-leo.png) |
 
-> 截图里的灰色是桌面的替身，实际运行时是全屏透明覆盖层。
+这几张是渲染快照，灰色是桌面的替身，实际运行时是全屏透明覆盖层。
+
+</details>
 
 ## 安装
 
