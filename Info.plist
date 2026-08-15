@@ -40,6 +40,11 @@
 			<array>
 				<string>public.item</string>
 			</array>
+			<!-- An empty context means "offer this everywhere". Omitting the
+			     key lets the system apply its default filtering, which keeps
+			     the item out of the Finder menu entirely. -->
+			<key>NSRequiredContext</key>
+			<dict/>
 		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>
