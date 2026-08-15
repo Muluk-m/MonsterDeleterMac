@@ -1,8 +1,6 @@
 # MonsterDeleter for macOS
 
-> 召唤怪兽大将摧毁文件 —— macOS 移植版
-
-在访达里选中文件，召唤一只怪兽走过来，指着它问「喂，是这个吗？」，然后一脚把它踹进废纸篓。
+召唤怪兽大将摧毁文件 —— macOS 移植版
 
 移植自 Windows 版 [SuperPrintf/MonsterDeleter](https://github.com/SuperPrintf/MonsterDeleter)，动画编排、时序和素材完全一致，界面层用 Swift + AppKit 重写。
 
@@ -13,19 +11,8 @@
 
 ![演示](docs/demo.gif)
 
-真机录屏：右键召唤 → 准星标记目标 → 怪兽走过来问「是这个吗」→ 一脚踹进废纸篓 → 雷欧登场收工。
 [高清版（带声音）](docs/demo.mp4)，也可以在 [Releases](../../releases) 里下载。
 
-<details>
-<summary>各阶段单帧</summary>
-
-| 怪兽走来 | 确认 | 踹飞 | 雷欧登场 |
-| --- | --- | --- | --- |
-| ![走来](docs/screenshots/04-walk-late.png) | ![确认](docs/screenshots/06-ask.png) | ![踹飞](docs/screenshots/07-kick-boom.png) | ![雷欧](docs/screenshots/08-leo.png) |
-
-这几张是渲染快照，灰色是桌面的替身，实际运行时是全屏透明覆盖层。
-
-</details>
 
 ## 安装
 
@@ -66,13 +53,6 @@
 2. 把文件拖到 `MonsterDeleter.app` 图标上
 3. 命令行：`/Applications/MonsterDeleter.app/Contents/MacOS/MonsterDeleter ~/要删的文件.txt`
 
-接下来：
-
-1. 屏幕变成选择界面，鼠标变成红色准星 —— **点一下要摧毁的目标位置**（点哪儿怪兽就在哪儿开打，和文件图标的真实位置无关）；
-2. 怪兽走过来，指着目标问「喂，是这个吗？」；
-3. 点任意一个回答（两个都是「是」，这是原作的玩笑）；
-4. 怪兽一脚踹爆目标，文件进废纸篓，雷欧登场，飞走收工。
-
 **随时按 `esc` 可以中断**，在踹出去之前中断的话文件不会被删。
 
 文件是移进**废纸篓**，不是直接抹掉，误删了可以捞回来。
@@ -86,8 +66,6 @@
 | 卸载软件 | 识别快捷方式对应的已安装程序，调官方卸载器 / BCUninstaller | **不做**，macOS 上删 App 就是把 `.app` 扔废纸篓 |
 | 权限不足 | 弹 UAC 提权重试 | 直接报哪些文件没删掉 |
 | 多显示器 | 鼠标所在显示器 | 同左 |
-
-动画时序（8 fps 精灵、4.5 秒走路、15 帧踹击、爆炸在第 5 帧触发删除……）与 Windows 版逐帧对齐。
 
 ## 从源码构建
 
