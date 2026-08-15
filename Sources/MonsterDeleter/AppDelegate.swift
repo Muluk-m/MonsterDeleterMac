@@ -1,4 +1,8 @@
 import AppKit
+import os
+
+/// `log show --predicate 'subsystem == "com.monsterdeleter.mac"' --last 5m`
+private let log = Logger(subsystem: "com.monsterdeleter.mac", category: "entry")
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: OverlayWindow?
@@ -8,8 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var launched = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.servicesProvider = self
         launched = true
+        log.notice("launched, \(CommandLine.arguments.count - 1) argument(s)")
 
         guard Assets.isAvailable else {
             report(title: "怪兽罢工了", message: "找不到素材目录，请从发布包运行 MonsterDeleter.app。")
@@ -23,31 +27,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .map { URL(fileURLWithPath: $0) }
         summon(with: pending + fromCommandLine)
 
-        // Nothing to delete: explain the two ways in and leave.
-        if window == nil {
-            showUsage()
+        // A services invocation is delivered *after* launching finishes, so a
+        // cold start reaches this point with nothing yet. Wait a beat before
+        // concluding the app was opened on its own.
+        guard window == nil else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.serviceGracePeriod) { [weak self] in
+            guard let self, self.window == nil else { return }
+            log.notice("no input within grace period, showing usage")
+            self.showUsage()
             NSApp.terminate(nil)
         }
     }
 
+    private static let serviceGracePeriod: TimeInterval = 1.0
+
     func application(_ application: NSApplication, open urls: [URL]) {
+        log.notice("open event, \(urls.count) url(s)")
         summon(with: urls)
     }
 
     // MARK: - Services
 
-    @objc func summonMonster(
+    /// The selector is spelled out: Finder looks up
+    /// `summonMonster:userData:error:` by name, and `error` must bridge as an
+    /// optional `NSString?` or the signature does not match and the request
+    /// goes unanswered.
+    @objc(summonMonster:userData:error:)
+    func summonMonster(
         _ pasteboard: NSPasteboard,
         userData: String?,
-        error: AutoreleasingUnsafeMutablePointer<NSString>
+        error: AutoreleasingUnsafeMutablePointer<NSString?>?
     ) {
-        summon(with: pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? [])
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? []
+        log.notice("service invoked, \(urls.count) item(s)")
+        summon(with: urls)
     }
 
     // MARK: - Helpers
 
     private func summon(with urls: [URL]) {
         let existing = urls.filter { FileManager.default.fileExists(atPath: $0.path) }
+        log.notice("summon: \(urls.count) given, \(existing.count) exist, window=\(self.window != nil)")
         guard !existing.isEmpty else { return }
         guard launched else {
             pending.append(contentsOf: existing)
