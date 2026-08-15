@@ -81,7 +81,7 @@
 需要 Xcode 命令行工具。
 
 ```bash
-git clone https://github.com/<your-account>/MonsterDeleterMac.git
+git clone https://github.com/Muluk-m/MonsterDeleterMac.git
 cd MonsterDeleterMac
 ./build.sh                # 通用二进制，产物在 build/MonsterDeleter.app
 UNIVERSAL=0 ./build.sh    # 只编译本机架构，迭代时快很多
