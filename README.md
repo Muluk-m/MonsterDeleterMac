@@ -6,6 +6,9 @@
 
 移植自 Windows 版 [SuperPrintf/MonsterDeleter](https://github.com/SuperPrintf/MonsterDeleter)，动画编排、时序和素材完全一致，界面层用 Swift + AppKit 重写。
 
+> **用 Windows？** 请移步原仓库 👉 **<https://github.com/SuperPrintf/MonsterDeleter>**
+> 本仓库只做 macOS 版本。
+
 ![选择目标](docs/screenshots/01-select.jpg)
 
 | 怪兽走来 | 确认 | 踹飞 | 雷欧登场 |
