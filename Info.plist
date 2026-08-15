@@ -30,7 +30,7 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>召唤怪兽摧毁</string>
+				<string>召唤怪兽大将摧毁</string>
 			</dict>
 			<key>NSMessage</key>
 			<string>summonMonster</string>

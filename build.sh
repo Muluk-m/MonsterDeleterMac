@@ -11,21 +11,20 @@ APP="$BUILD_DIR/$APP_NAME.app"
 CONFIG="release"
 UNIVERSAL="${UNIVERSAL:-1}"
 
+BUILD_ARGS=(-c "$CONFIG")
 if [ "$UNIVERSAL" = "1" ]; then
-  ARCH_FLAGS=(--arch arm64 --arch x86_64)
-else
-  ARCH_FLAGS=()
+  BUILD_ARGS+=(--arch arm64 --arch x86_64)
 fi
 
-echo "==> swift build (${CONFIG}${UNIVERSAL:+, universal=$UNIVERSAL})"
-swift build -c "$CONFIG" ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"}
-BIN_PATH="$(swift build -c "$CONFIG" ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"} --show-bin-path)/$APP_NAME"
+echo "==> swift build ($CONFIG, universal=$UNIVERSAL)"
+swift build "${BUILD_ARGS[@]}"
+BIN_PATH="$(swift build "${BUILD_ARGS[@]}" --show-bin-path)/$APP_NAME"
 
 mkdir -p "$BUILD_DIR"
 
 ICON_SRC="Resources/icon/monster-logo.png"
 ICNS="$BUILD_DIR/AppIcon.icns"
-if [ ! -f "$ICNS" ] && [ -f "$ICON_SRC" ]; then
+if [ -f "$ICON_SRC" ] && { [ ! -f "$ICNS" ] || [ "$ICON_SRC" -nt "$ICNS" ]; }; then
   echo "==> generating AppIcon.icns"
   ICONSET="$BUILD_DIR/AppIcon.iconset"
   rm -rf "$ICONSET"

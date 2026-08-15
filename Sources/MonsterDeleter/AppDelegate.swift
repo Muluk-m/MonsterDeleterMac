@@ -2,8 +2,8 @@ import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: OverlayWindow?
-    /// Finder can deliver the selection before or after launch finishes; a
-    /// pending list covers the early case.
+    /// Finder can deliver the selection before launch finishes; hold it until
+    /// there is somewhere to put it.
     private var pending: [URL] = []
     private var launched = false
 
@@ -12,13 +12,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         launched = true
 
         guard Assets.isAvailable else {
-            report("找不到素材目录，请从发布包运行 MonsterDeleter.app。")
+            report(title: "怪兽罢工了", message: "找不到素材目录，请从发布包运行 MonsterDeleter.app。")
             NSApp.terminate(nil)
             return
         }
 
-        let arguments = CommandLine.arguments.dropFirst().filter { !$0.hasPrefix("-") }
-        let fromCommandLine = arguments.map { URL(fileURLWithPath: $0) }
+        let fromCommandLine = CommandLine.arguments
+            .dropFirst()
+            .filter { !$0.hasPrefix("-") }
+            .map { URL(fileURLWithPath: $0) }
         summon(with: pending + fromCommandLine)
 
         // Nothing to delete: explain the two ways in and leave.
@@ -32,8 +34,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         summon(with: urls)
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
-
     // MARK: - Services
 
     @objc func summonMonster(
@@ -41,8 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         userData: String?,
         error: AutoreleasingUnsafeMutablePointer<NSString>
     ) {
-        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? []
-        summon(with: urls)
+        summon(with: pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? [])
     }
 
     // MARK: - Helpers
@@ -57,36 +56,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // One monster at a time.
         guard window == nil else { return }
 
-        let window = OverlayWindow.make(targets: existing) { [weak self] failure in
+        let window = OverlayWindow(
+            targets: existing,
+            options: .fromEnvironment
+        ) { [weak self] failures in
             self?.window?.orderOut(nil)
             self?.window = nil
-            if let failure { self?.report("有文件没能移进废纸篓：\n\(failure)") }
+            self?.reportFailures(failures)
             NSApp.terminate(nil)
         }
         self.window = window
         window.present()
     }
 
-    private func showUsage() {
-        let alert = NSAlert()
-        alert.messageText = "怪兽大将待命中"
-        alert.informativeText = """
-        在访达里选中文件或文件夹，然后：
-
-        · 右键 →「服务」→「召唤怪兽摧毁」
-        · 或把它们拖到本 App 图标上
-
-        怪兽会请你用准星标记目标，确认后把它们踹进废纸篓。
-        """
-        alert.alertStyle = .informational
-        alert.runModal()
+    /// The view reports which URLs it could not trash; the wording lives here.
+    private func reportFailures(_ failures: [URL: Error]) {
+        guard !failures.isEmpty else { return }
+        let lines = failures
+            .map { "\($0.key.lastPathComponent)：\($0.value.localizedDescription)" }
+            .sorted()
+        report(title: "有文件没能进废纸篓", message: lines.joined(separator: "\n"))
     }
 
-    private func report(_ message: String) {
+    private func showUsage() {
+        report(
+            title: "怪兽大将待命中",
+            message: """
+            在访达里选中文件或文件夹，然后：
+
+            · 右键 →「服务」→「召唤怪兽大将摧毁」
+            · 或把它们拖到本 App 图标上
+
+            怪兽会请你用准星标记目标，确认后把它们踹进废纸篓。
+            """,
+            style: .informational
+        )
+    }
+
+    private func report(title: String, message: String, style: NSAlert.Style = .warning) {
         let alert = NSAlert()
-        alert.messageText = "怪兽罢工了"
+        alert.messageText = title
         alert.informativeText = message
-        alert.alertStyle = .warning
+        alert.alertStyle = style
         alert.runModal()
     }
 }
